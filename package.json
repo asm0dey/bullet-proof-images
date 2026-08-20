@@ -1,0 +1,19 @@
+{
+  "name": "bullet-proof-images",
+  "private": true,
+  "scripts": {
+    "dev": "slidev bullet-proof-images.md --open",
+    "build": "slidev build bullet-proof-images.md",
+
+    "export": "slidev export bullet-proof-images.md --with-clicks --output dist-pdf/bullet-proof-images.pdf",
+    "export:notes": "slidev export-notes bullet-proof-images.md --output dist-pdf/speaker-notes.pdf"
+  },
+  "dependencies": {
+    "@slidev/cli": "^52.0.0",
+    "@slidev/theme-seriph": "^0.25.0",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "playwright-chromium": "^1.50.0"
+  }
+}

@@ -1,0 +1,162 @@
+/* Mission Possible — style anchor palette.
+   Crushed near-black ground, cold teal shadow, ONE warm amber accent.
+   Deliberately not the speaker's usual #5B2C6F, so the illustrations
+   (black/teal/amber) do not sit on a foreign ground. */
+:root {
+  --ink:      #05070a;   /* crushed black, deck ground */
+  --ink-2:    #0b1016;   /* raised surface */
+  --teal:     #7fb3c8;   /* cold shadow / body text */
+  --teal-dim: #40606f;   /* muted */
+  --amber:    #f0a03c;   /* the single warm practical. Use sparingly. */
+  --paper:    #dfe8ee;   /* headings */
+}
+
+/* NOTE: this must NOT apply to full-bleed slides - an opaque background here
+   paints straight over the `background:` frontmatter image. */
+.slidev-layout:not(.fullbleed) { background: var(--ink); color: var(--teal); }
+.slidev-layout.fullbleed { background: transparent !important; color: var(--paper); }
+.slidev-layout h1 { color: var(--paper); font-weight: 600; letter-spacing: -0.01em; }
+.slidev-layout h2 { color: var(--teal); font-weight: 400; }
+.slidev-layout strong { color: var(--amber); }
+.slidev-layout code { color: var(--amber); }
+.slidev-layout a { color: var(--amber); }
+
+/* monospace payloads: scan output, tables, flag lists */
+
+
+/* ---- full-bleed illustration slides ---- */
+.fullbleed { padding: 0 !important; }
+.fullbleed .overlay-title {
+  position: absolute; left: 6%; right: 6%;
+  color: var(--paper); font-size: 2.6em; line-height: 1.15;
+  font-weight: 600; text-shadow: 0 2px 24px rgba(0,0,0,.65);
+  margin: 0; z-index: 2;
+}
+/* zone-sized scrim - never full-slide, so the art keeps its brightness */
+.fullbleed .scrim {
+  position: absolute; left: 0; right: 0; z-index: 1;
+  background: linear-gradient(to bottom, rgba(5,7,10,.72), rgba(5,7,10,.30));
+}
+.zone-upper .scrim        { top: 0; height: 34%; }
+.zone-upper .overlay-title{ top: 9%; }
+.zone-lower .scrim        { bottom: 0; height: 34%;
+  background: linear-gradient(to top, rgba(5,7,10,.72), rgba(5,7,10,.30)); }
+.zone-lower .overlay-title{ bottom: 11%; }
+.zone-mid   .scrim        { top: 33%; height: 34%; }
+.zone-mid   .overlay-title{ top: 41%; }
+
+/* ---- step dividers ---- */
+.divider .step-num {
+  color: var(--amber); font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9em; letter-spacing: .32em; margin-bottom: .6em;
+}
+.divider h1 { font-size: 2.4em; margin: 0 0 .5em; }
+.divider .step-goal { color: var(--teal-dim); font-size: 1.05em; }
+
+/* ---- title + blackout ---- */
+.title-slide { background: var(--ink) !important; }
+.title-slide h1 { font-size: 3.1em; letter-spacing: .04em; }
+.title-slide .handle { color: var(--amber); margin-top: 2em; font-family: 'JetBrains Mono', monospace; }
+.blackout, .blackout .slidev-layout { background: #000 !important; }
+.blackout-slide { width: 100%; height: 100%; background: #000; }
+
+
+/* ---- code sizing ----
+   Slidev's default code size is tuned for a laptop screen, not a conference
+   room. These slides are read from the back row, so code is the primary
+   payload and gets sized like it. */
+.slidev-layout .slidev-code,
+.slidev-layout pre.shiki,
+.slidev-layout pre code {
+  font-size: 1.06em !important;
+  line-height: 1.45 !important;
+}
+.slidev-layout .slidev-code-wrapper { margin: 0.4em 0; }
+/* line numbers shouldn't grow with the code */
+.slidev-layout .slidev-code .line-numbers { opacity: .35; }
+
+/* headings get a touch tighter so the bigger code still fits */
+.slidev-layout h1 { font-size: 1.9em; margin-bottom: .45em; }
+
+
+/* ---- seriph dims the first paragraph after a heading as a "subtitle".
+   On these slides the first line is content, not a subtitle. ---- */
+/* Exclude click-hidden elements: Slidev hides them with opacity 0, and an
+   !important opacity here would pin them visible and silently kill v-click. */
+.slidev-layout h1 + p:not(.slidev-vclick-hidden),
+.slidev-layout h1 + p em,
+.slidev-layout p:first-of-type:not(.slidev-vclick-hidden) {
+  color: var(--teal) !important;
+  font-size: inherit !important;
+  font-style: normal !important;
+}
+.slidev-layout h1 + p:not(.slidev-vclick-target),
+.slidev-layout p:first-of-type:not(.slidev-vclick-target) {
+  opacity: 1;
+}
+
+/* seriph's cover pulls a remote unsplash image; kill it, we set our own ground */
+.slidev-layout.cover { background-image: none !important; }
+
+
+/* ---- the Big Idea slide ----
+   One sentence, one type size. Nothing else competes with it. */
+.bigidea .bigidea-text {
+  font-size: 2.15em; line-height: 1.25; font-weight: 600;
+  color: var(--paper); max-width: 20ch; margin: 0 auto; text-align: left;
+  border-left: 3px solid var(--amber); padding-left: .6em;
+}
+.bigidea h1, .bigidea h2 { display: none; }
+
+/* ordered lists: number in the accent, content in body colour */
+.slidev-layout ol { padding-left: 1.4em; }
+.slidev-layout ol li { margin: .35em 0; }
+.slidev-layout ol li::marker { color: var(--amber); font-family: 'JetBrains Mono', monospace; }
+
+
+/* ---- tables ----
+   Read from the back row: generous padding, a real header rule, numeric
+   columns in mono and right-aligned so digits line up. */
+.slidev-layout table {
+  width: 100%; border-collapse: collapse; margin: .6em 0;
+  font-size: .95em;
+}
+.slidev-layout table th {
+  text-align: left; color: var(--amber);
+  font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+  font-size: .78em; padding: .5em .7em;
+  border-bottom: 2px solid var(--teal-dim);
+  white-space: nowrap;
+}
+.slidev-layout table td {
+  padding: .45em .7em; color: var(--teal);
+  border-bottom: 1px solid rgba(64,96,111,.28);
+  vertical-align: top;
+}
+.slidev-layout table tr:last-child td { border-bottom: none; }
+/* a cell that is purely a figure gets mono + right alignment */
+.slidev-layout table td:not(:first-child) {
+  font-variant-numeric: tabular-nums;
+}
+/* first column is the label - keep it prose */
+.slidev-layout table td:first-child { font-family: inherit; color: var(--paper); }
+/* Totals get emphasis by opting in, not by position - a last row is only a
+   total in some tables (cost table yes, triage record no). */
+.slidev-layout table tr td:first-child:is([data-total]) { font-weight: 600; }
+
+/* v-click items shouldn't reserve space before they appear */
+.slidev-layout .slidev-vclick-target { transition: opacity .18s ease; }
+
+
+/* ---- full-bleed background layer ----
+   Not a stylistic choice: `layout: image` discards slide content and
+   `layout: full` + `background:` is ignored by seriph, both verified in the
+   browser. These slides need the image AND an overlaid title. */
+.fullbleed .bg-image {
+  position: absolute; inset: 0; z-index: 0;
+  background-size: cover; background-position: center; background-repeat: no-repeat;
+}
+
+
+/* a verdict / conclusion line inside a slide */
+.slidev-layout h3 { color: var(--amber); font-weight: 600; margin-top: .5em; }
