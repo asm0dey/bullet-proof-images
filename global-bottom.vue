@@ -2,7 +2,7 @@
   <!-- deck-wide footer, per design_rules.footer.pattern '@handle | #conference | #topic'.
        Suppressed on full-bleed art, the cover, the blackout and the bio slide. -->
   <footer v-if="!hideFooter" class="deck-footer">
-    @asm0dey <span class="sep">|</span> #JCON <span class="sep">|</span> #containers
+    @asm0dey <span class="sep">|</span> #DevoxxBE <span class="sep">|</span> #containers
   </footer>
 
   <!-- Ambient bed. ONE persistent element so it survives slide changes: the bed

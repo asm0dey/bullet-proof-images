@@ -10,7 +10,7 @@ drawings:
 transition: fade
 title: "Mission Possible: The 45-Minute Path to Bullet-Proof Java Container Images"
 info: |
-  JCON @BTC 2026 - Pasha Finkelshteyn, BellSoft
+  Devoxx Belgium 2026 - Pasha Finkelshteyn, BellSoft
 fonts:
   sans: Inter
   mono: JetBrains Mono
@@ -87,18 +87,20 @@ concrete first, principle second
 ---
 layout: image-left
 image: /pasha.jpeg
-class: imgtxt
+class: imgtxt dossier
 ---
+
+<div class="dossier-head">PERSONNEL FILE · BPI-2026 · EYES ONLY</div>
 
 # Pasha Finkelshteyn
 
-Developer Advocate, BellSoft
+<div class="field"><span>ROLE</span>Developer Advocate, BellSoft</div>
+<div class="field"><span>SERVICE</span>10+ years in the JVM ecosystem</div>
+<div class="field"><span>LANGUAGES</span>Java · Kotlin</div>
+<div class="field"><span>FIELD RECORD</span>Has built hardened images by hand</div>
+<div class="field"><span>NOTE</span>Will be honest about what it costs</div>
 
-10+ years in the JVM ecosystem
-
-Java and Kotlin
-
-I've built hardened images by hand. That's why I'll be honest about what it costs.
+<div class="stamp">CLEARED</div>
 
 <!--
 credentials only now, after the hook
@@ -198,8 +200,8 @@ vulnerability -> remote code execution -> data breach
 
 <v-click>
 
-~1 in 5 known CVEs is exploited in the wild  
-average breach cost: >$4M
+~6% of published CVEs have been exploited in the wild  
+average breach cost: $4.44M (US: $10.22M)
 
 </v-click>
 
@@ -211,12 +213,16 @@ Money is recoverable. An audit finding follows you for years.
 
 <v-click>
 
-source: DATA-04 — confirm exact report, figure and year before delivery
+sources: [Cyentia & FIRST, EPSS Data and Performance (2024)](https://www.cyentia.com/publication/exploit-prediction-scoring-system-2/) · [IBM, Cost of a Data Breach (2025)](https://www.ibm.com/reports/data-breach)
 
 </v-click>
 
 <!--
-`TODO: DATA-04`
+About six percent of published vulnerabilities have ever been exploited in the wild. Of your forty-six, that is roughly three. Not all of them are going to hurt you. A few will.
+
+The average breach costs four point four million dollars. In the US it is over ten. In this room I suspect that is not the number that frightens you.
+
+13,807 of 237,687 CVEs exploited as of 2024-05-31 (Cyentia/FIRST EPSS report). IBM 2025: global avg $4.44M, US $10.22M.
 -->
 
 ---
@@ -239,13 +245,15 @@ layout: default
 
 **OBJECTIVE** — not zero CVEs. **Zero unmanaged risk.**
 
+*Every CVE left is either fixed, or accepted by a named owner with an expiry date.*
+
 <v-clicks>
 
-1. Limit privileges
-2. Shrink the surface
-3. Classify by context, not by score
-4. Fix what can't be fixed here
-5. Prove it to someone who wasn't there
+1. **Limit privileges** — when it goes wrong, it goes wrong smaller
+2. **Shrink the surface** — less to reason about
+3. **Classify by context, not by score** — work on what can actually hurt you
+4. **Patch what's left** — fix the critical ones
+5. **Prove it to your auditor** — what's inside, who built it, where it came from
 
 </v-clicks>
 
@@ -301,6 +309,14 @@ layout: default
 --security-opt=no-new-privileges
 --read-only  --tmpfs /tmp
 ```
+
+<div class="code-note">
+  <div v-click.hide="1">Hands the container the host. If you need it, you need a VM.</div>
+  <div v-click="[1,2]">Start from zero capabilities — not from Docker's default set.</div>
+  <div v-click="[2,3]">Add back the one you actually need, and forbid regaining any more.</div>
+  <div v-click="[3,4]">Immutable filesystem. Writable scratch only where the app really writes.</div>
+  <div v-click="4">Four flags. No rebuild, no code change, works on the image you ship today.</div>
+</div>
 
 <!--
 Step 1-2 — shrink the blast radius, shrink the surface
@@ -428,6 +444,13 @@ It doesn't know:
 
 <v-click>
 
+**Example:** [Spring4Shell, CVE-2022-22965](https://spring.io/security/cve-2022-22965) — CVSS **9.8**.  
+Known exploit needs a WAR on Tomcat. A Spring Boot fat jar: not exploitable that way.
+
+</v-click>
+
+<v-click>
+
 Sorting by CVSS is sorting by someone else's worst case.
 
 </v-click>
@@ -442,15 +465,16 @@ layout: default
 
 # Escalate, de-escalate
 
-| ESCALATE | DE-ESCALATE |
+Start at the CVSS score. Then move it with what only you know.
+
+| ↑ ESCALATE | ↓ DE-ESCALATE |
 |---|---|
-| internet-facing | not reachable |
+| internet-facing | not reachable from outside |
 | on the hot path | behind a control you own |
 | lateral movement possible | single service, contained |
-| patch exists now | no patch exists |
 
 <!--
-**Third foreshadow of the crisis**
+Start at CVSS, move it with what only you know. Spring4Shell callback.
 -->
 
 ---
@@ -490,19 +514,31 @@ layout: default
 
 - **Patch now** — exploitable, exposed, big blast radius, and a patch exists
 - **Next update** — lower exposure, lower exploitability, patch exists
-- **Accept** — not exploitable, or no patch exists yet
+- **Accept** — not exploitable in your context
+- **No patch yet?** That's step 4.
 
 </v-clicks>
 
 <v-click>
 
-Every acceptance carries an expiry date and a name.  
-An exception without an expiry isn't a decision. It's an omission.
+Meanwhile, careful:
+
+```bash
+$ trivy image --ignore-unfixed app:latest
+```
+
+hides every CVE without a fix — from the report, not from production.
+
+</v-click>
+
+<v-click>
+
+Every acceptance should carry an expiry date and a name.
 
 </v-click>
 
 <!--
-Step 3 — triage under fire
+**Third foreshadow of the crisis** — on the --ignore-unfixed line. Do not elaborate.
 -->
 
 ---
@@ -527,27 +563,37 @@ layout: default
 # Pull the fresh base
 
 ```bash
-$ docker pull bellsoft/liberica-runtime-container:jre-25-musl   # latest
-$ osv-scanner scan image app:latest
+$ docker pull debian:bookworm-slim     # newest
+$ trivy image app:latest
 ```
 
 <v-click>
 
-Total: 3  
-  CRITICAL  CVE-XXXX-XXXXX   fixed in: 3.23.4
+| Library | Vulnerability | Severity | Status | Installed | Fixed |
+|---|---|---|---|---|---|
+| zlib1g | CVE-2023-45853 | CRITICAL | will_not_fix | 1:1.2.13.dfsg-1 | |
 
 </v-click>
 
 <v-click>
 
-Installed version: 3.23.3
+Fixed upstream in **zlib 1.3.1** — January 2024.  
+The newest bookworm image still ships **1.2.13**.
+
+</v-click>
+
+<v-click>
+
+sources: [NVD, CVE-2023-45853](https://nvd.nist.gov/vuln/detail/CVE-2023-45853) · [Debian security tracker](https://security-tracker.debian.org/tracker/CVE-2023-45853) · [zlib 1.3.1 release](https://github.com/madler/zlib/releases/tag/v1.3.1)
 
 </v-click>
 
 <!--
-**Point at the fixed-version column**
+**Point at the empty Fixed column**
 ← PAYOFF `patch-column`
-`TODO: DATA-06`
+
+If challenged: Debian marks it ignored because minizip isn't built in bookworm.
+That's a context call (step 3) - you only know it after you do the triage yourself.
 -->
 
 ---
@@ -571,15 +617,31 @@ layout: default
 
 # Why it isn't here
 
-```text
-CVE published  →  upstream fix  →  OS package  →  image rebuild  →  you
-                  hours-weeks      hours-days     their cadence
+<br>
+
+```mermaid {scale: 0.68}
+%%{init: {'theme':'base','themeVariables':{
+  'background':'#05070a',
+  'primaryColor':'#0b1016','primaryTextColor':'#dfe8ee','primaryBorderColor':'#40606f',
+  'lineColor':'#7fb3c8','edgeLabelBackground':'#05070a','tertiaryColor':'#0b1016',
+  'fontFamily':'Inter','fontSize':'16px'
+}}}%%
+flowchart LR
+  A[CVE published] -->|hours-weeks| B[upstream fix]
+  B -->|hours-days| C[OS package]
+  C -->|their cadence| D[image rebuild]
+  D --> E[you]
+  style E stroke:#f0a03c,color:#f0a03c
 ```
 
 <v-click>
 
+<div class="mt-14">
+
 A free image is a gift, not a commitment.  
 Nobody in that chain owes you a date - including us.
+
+</div>
 
 </v-click>
 
@@ -673,14 +735,18 @@ layout: default
 
 # What it actually costs
 
-| hardening area | learn once | every week |
+Per base image. Rough estimates — your numbers will differ, the shape won't.
+
+| | set up once | ongoing |
 |---|---|---|
-| package mgmt | 16 h | 2 h |
-| privileges | 8 h | 1 h |
-| rootless | 12 h | 3 h |
-| vuln patching | 24 h | 4 h |
-| supply chain | 20 h | 2 h |
-| TOTAL | ~80 h | ~12 h/wk |
+| non-root, drop capabilities | 1–2 days | ≈ 0 |
+| minimal base, multi-stage build | 2–3 days | ≈ 0 |
+| scanning in CI + triage process | 2–3 days | 2–4 h/wk |
+| patch: apply updates, regression-test, roll out | — | 4–8 h/wk |
+| JDK security update (now monthly) | — | ½–1 day a month |
+| signing, SBOM, provenance | 3–5 days | ~1 h/wk |
+| **backport a fix that isn't shipped** | — | **days, every time** |
+| **TOTAL** | **~2–3 weeks** | **8–15 h/wk + every backport** |
 
 <!--
 **Callback: the hands from slide 2.**
@@ -778,7 +844,7 @@ class: divider
 
 <div class="step-num">STEP 5</div>
 
-# Prove it to someone who wasn't there
+# Prove it to your auditor
 
 <div class="step-goal">Goal: evidence that outlives the scan.</div>
 
@@ -797,6 +863,8 @@ layout: default
 | Did this image come from who it claims? | signature |
 | What's actually inside it? | SBOM |
 | Who built the thing in production, and how? | attestation |
+
+**Attestation** = a signed record from your build: which commit, which pipeline, which steps.
 
 <v-click>
 
@@ -959,12 +1027,12 @@ layout: default
 # Hardened isn't permanent
 
 The supplier keeps patching.  
+
 Your pipeline doesn't notice.
 
 <v-click>
 
-A hardened image you pulled in March  
-is a March image in September.
+A hardened image you pulled in March is a March image in September.
 
 </v-click>
 
@@ -1065,7 +1133,10 @@ layout: default
 
 # The checklist is yours
 
-asm0dey.github.io/docker-hardening-checklist
+<div class="grid grid-cols-[1fr_auto] gap-12 items-center">
+<div>
+
+[asm0dey.github.io/docker-hardening-checklist](https://asm0dey.github.io/docker-hardening-checklist/)
 
 <v-click>
 
@@ -1075,8 +1146,8 @@ Every step in this talk, as a checklist. No strings.
 
 <v-click>
 
-OWASP Docker Security Cheat Sheet  
-osv-scanner  ·  trivy  ·  cosign  ·  CycloneDX  ·  SLSA
+[OWASP Docker Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html)  
+[osv-scanner](https://github.com/google/osv-scanner)  ·  [trivy](https://trivy.dev/)  ·  [cosign](https://github.com/sigstore/cosign)  ·  [CycloneDX](https://cyclonedx.org/)  ·  [SLSA](https://slsa.dev/)
 
 </v-click>
 
@@ -1085,6 +1156,12 @@ osv-scanner  ·  trivy  ·  cosign  ·  CycloneDX  ·  SLSA
 @asm0dey
 
 </v-click>
+
+</div>
+
+<img src="/qr-checklist.png" alt="QR code: asm0dey.github.io/docker-hardening-checklist" class="w-64 h-64" style="image-rendering: pixelated" />
+
+</div>
 
 <!--
 name the limits; no product verdict
