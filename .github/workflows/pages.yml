@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
-      - run: bun install
+      - run: bun install --frozen-lockfile
       - run: bun run build -- --base /${{ github.event.repository.name }}/
       - run: cp dist/index.html dist/404.html
       - uses: actions/configure-pages@v5
